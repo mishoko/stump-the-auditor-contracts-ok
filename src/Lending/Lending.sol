@@ -273,7 +273,7 @@ contract Lending is ILendingPool, Ownable2Step, ReentrancyGuard, Pausable {
         Reserve storage debtReserve = _getReserveStorage(debtAsset);
 
         (,,, uint256 healthFactor) = _getUserAccountData(borrower);
-        if (healthFactor >= MIN_HEALTH_FACTOR) revert HealthFactorNotBelowThreshold(healthFactor);
+        if (healthFactor > MIN_HEALTH_FACTOR) revert HealthFactorNotBelowThreshold(healthFactor);
 
         uint256 debtValueWad;
         uint256 liquidatorBonus;
@@ -828,8 +828,8 @@ contract Lending is ILendingPool, Ownable2Step, ReentrancyGuard, Pausable {
     }
 
     function _availableLiquidity(address asset, uint256 accruedReserves) internal view returns (uint256 liquidity) {
-        accruedReserves;
-        liquidity = IERC20(asset).balanceOf(address(this));
+        uint256 balance = IERC20(asset).balanceOf(address(this));
+        liquidity = accruedReserves < balance ? balance - accruedReserves : balance;
     }
 
     function _validateReserveParams(

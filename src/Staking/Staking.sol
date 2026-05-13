@@ -178,7 +178,7 @@ contract Staking is IStaking, Ownable2Step, ReentrancyGuard, Pausable {
 
         uint128 amount = userStake.amount;
         uint128 boostedAmount = userStake.boostedAmount;
-        uint128 penalty = _toUint128(Math.mulDiv(amount, earlyUnstakePenaltyBps, BPS));
+        uint128 penalty = _toUint128(Math.mulDiv(boostedAmount, earlyUnstakePenaltyBps, BPS));
         uint128 returnAmount = amount - penalty;
 
         userStake.withdrawn = true;
@@ -582,7 +582,10 @@ contract Staking is IStaking, Ownable2Step, ReentrancyGuard, Pausable {
             return;
         }
 
-        reward.rewardPerTokenStored += Math.mulDiv(penalty, ACCUMULATOR_PRECISION, eligibleBoostedSupply);
+        // Distribute penalty to eligible stakers via accumulator bump, then
+        // advance the penalized user's paid marker so they cannot claim their
+        // own penalty through any remaining active stakes.
+        reward.rewardPerTokenStored += Math.mulDiv(penalty, ACCUMULATOR_PRECISION, totalBoostedSupply);
         userRewardPerTokenPaid[penalizedUser][primaryRewardToken] = reward.rewardPerTokenStored;
 
         emit PenaltyFlushed(primaryRewardToken, penalty, reward.periodFinish);
