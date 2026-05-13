@@ -157,8 +157,8 @@ contract Lending is ILendingPool, Ownable2Step, ReentrancyGuard, Pausable {
             _removeCollateralAsset(msg.sender, asset);
         }
 
-        if (_userHasDebt(msg.sender)) {
-            (,,, uint256 healthFactor) = _getUserAccountData(msg.sender);
+        if (_userHasDebt(to)) {
+            (,,, uint256 healthFactor) = _getUserAccountData(to);
             if (healthFactor < MIN_HEALTH_FACTOR) revert HealthFactorBelowThreshold(healthFactor);
         }
 
@@ -640,7 +640,7 @@ contract Lending is ILendingPool, Ownable2Step, ReentrancyGuard, Pausable {
         debtRepaid = Math.min(debtToCover, borrowerDebt);
 
         // rounding: liquidation burns scaled debt DOWN, same as repay, to favor the protocol.
-        uint256 scaledDebtRepaid = Math.mulDiv(debtRepaid, RAY, debtReserve.borrowIndex);
+        uint256 scaledDebtRepaid = Math.mulDiv(debtRepaid, RAY, debtReserve.supplyIndex);
         if (scaledDebtRepaid == 0) revert ZeroAmount();
         if (scaledDebtRepaid > borrowerScaledDebt) scaledDebtRepaid = borrowerScaledDebt;
 

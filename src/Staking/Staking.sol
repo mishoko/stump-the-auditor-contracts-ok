@@ -162,7 +162,7 @@ contract Staking is IStaking, Ownable2Step, ReentrancyGuard, Pausable {
         _userActiveStakeCount[msg.sender] -= 1;
         _userBoostedAmount[msg.sender] -= boostedAmount;
 
-        stakingToken.safeTransfer(msg.sender, amount);
+        stakingToken.safeTransfer(msg.sender, boostedAmount);
 
         emit Unstaked(msg.sender, stakeId, amount);
     }

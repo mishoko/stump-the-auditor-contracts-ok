@@ -31,7 +31,7 @@ library LendingMath {
         uint256 totalSupplyActual =
             scaledToUnderlying(updated.totalScaledSupply, updated.supplyIndex, Math.Rounding.Floor);
         uint256 totalBorrowActual =
-            scaledToUnderlying(updated.totalScaledBorrow, updated.borrowIndex, Math.Rounding.Floor);
+            scaledToUnderlying(updated.totalScaledBorrow, updated.supplyIndex, Math.Rounding.Floor);
 
         if (totalSupplyActual == 0 && totalBorrowActual == 0) {
             return (updated, 0, true);
